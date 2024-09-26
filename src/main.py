@@ -1,32 +1,53 @@
 import time
 from enum import Enum
 
+
+class Memoria:
+    def __init__(self, size: int):
+        self._size: int = size
+        self.memoria = ['-' for _ in range(size)]
+
+    def add_to_memory(self, size_in_memory: int, indice_memoria: int) -> None:
+        if size_in_memory > self._size:
+            raise ValueError("Tamaño superior al esperado")
+        if indice_memoria > self._size:
+            raise ValueError("indice fuera de limites")
+
+
+
+
 class State(Enum):
     NUEVO = 1  # se a creado el proceso
     LISTO = 2  # listo para ejecutarse
     EJECUTANDO = 3  # el manager de prosesos tiene control
     BLOQUEADO = 4  # proceso esperando
-    TERMINADO = 5  # proceso termino
+    TERMINADO = 5  # proceso terminó y listo para quitar de memoria
+
 
 class Process:
-    def __init__(
-        self, id: int, size_memory: int, execution_time: float, priority: int = 1
-    ) -> None:
-        self._id: int = id
-        self._size_memory: int = size_memory
-        self._execution_time: float = execution_time
-        self._priority: int = priority
-        self._state: State = State.NUEVO
+    ids: list[int] = list
+
+    def __init__(self, size_in_memory: int, execution_time: float, priority: int = 1) -> None:
+        self._id: int = -1
+        self.__set_id__()
+        self._size_memory: int = size_in_memory
+        self.size_memory = size_in_memory
+        self._execution_time: float
+        self.execution_time = execution_time
+        self._priority: int
+        self.priority = priority
+        self._state: State
+        self.state = State.NUEVO
 
     @property
     def id(self) -> int:
         return self._id
 
-    @id.setter
-    def id(self, value: int) -> None:
-        if value < 0:
-            raise ValueError("El ID del proceso no puede ser negativo.")
-        self._id = value
+    def __set_id__(self) -> None:
+        if len(Process.ids) > 0:
+            self._id = max(Process.ids) + 1
+        else:
+            self._id = 0
 
     @property
     def size_memory(self) -> int:
@@ -69,11 +90,13 @@ class Process:
 
 from collections import deque
 
+
 class Algorithm(Enum):
     FIFO = 1  # Los procesos se ejecutan en el orden en que llegan.
     SJF = 2  # (Shortest Job First) - El proceso con el menor tiempo de ejecución se ejecuta primero.
     ROUND_ROBIN = 3  # Cada proceso recibe un tiempo fijo (time_quantum) para ejecutar, después de lo cual se pasa al siguiente proceso en la cola.
     PRIORITY = 4  # Los procesos se ejecutan según su prioridad, siendo el proceso con la mayor prioridad el primero en ejecutarse.
+
 
 class ProcessManager:
     def __init__(self, memory_size: int, algorithm: Algorithm) -> None:
@@ -126,8 +149,8 @@ class ProcessManager:
 
     def move_queue(self) -> None:
         while (
-            len(self.waiting_queue) > 0
-            and self.waiting_queue[0].size_memory <= self.available_memory
+                len(self.waiting_queue) > 0
+                and self.waiting_queue[0].size_memory <= self.available_memory
         ):
             self.ready_queue.append(self.waiting_queue.popleft())
 
@@ -181,6 +204,5 @@ class ProcessManager:
                 return self.finish_process(current_process)
 
 
-
 if __name__ == "__main__":
-
+    pass
