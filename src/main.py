@@ -1,21 +1,6 @@
 import time
 from enum import Enum
 
-
-class Memoria:
-    def __init__(self, size: int):
-        self._size: int = size
-        self.memoria = ['-' for _ in range(size)]
-
-    def add_to_memory(self, size_in_memory: int, indice_memoria: int) -> None:
-        if size_in_memory > self._size:
-            raise ValueError("Tamaño superior al esperado")
-        if indice_memoria > self._size:
-            raise ValueError("indice fuera de limites")
-
-
-
-
 class State(Enum):
     NUEVO = 1  # se a creado el proceso
     LISTO = 2  # listo para ejecutarse
@@ -86,6 +71,33 @@ class Process:
         if not isinstance(value, State):
             raise ValueError("El estado no es válido.")
         self._state = value
+
+
+class Memoria:
+    def __init__(self, size: int):
+        self._size: int = size
+        self.memoria_en_uso: list[bool] = [False for _ in range(size)]
+        self.memory:list
+
+
+    def add_to_memory(self, size_in_memory: int, indice_memoria: int) -> None:
+        if size_in_memory > self._size:
+            raise ValueError("Tamaño superior al esperado")
+        if indice_memoria >= self._size:
+            raise ValueError("Indice fuera de limites")
+        if indice_memoria + size_in_memory > self._size:
+            raise ValueError("Paquete fuera de limites")
+        for _ in range(size_in_memory):
+            self.memoria_en_uso[indice_memoria] = True
+            indice_memoria += 1
+
+    def add_process_to_memory(self, process: Process, indice_memoria: int):
+        if process.size_memory > self._size:
+            raise ValueError("Tamaño superior al esperado")
+        if indice_memoria >= self._size:
+            raise ValueError("Indice fuera de limites")
+        if indice_memoria + process.size_memory > self._size:
+            raise ValueError("Proceso fuera de limites")
 
 
 from collections import deque
